@@ -110,7 +110,7 @@ class RedisWrapper(StorageBase):
         Args:
             url(str): the URL that already shortened
         Returns:
-            str: the information of the URL
+            dict: the information of the URL
         """
         redis_value = self._redis.get(url)
         redis_value_dict = self.convert_redis_value_to_dict(redis_value)

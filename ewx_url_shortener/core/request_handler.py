@@ -100,9 +100,7 @@ class RequestHandler:
         url = self.dbw.short_code_exists(short_code)
         try:
             if url:
-                short_code_info = self.dbw.get_short_code_info_by_url(url)
-                short_code_info_dict = {item.split(':')[0]: item.split(':')[1]
-                                        for item in short_code_info.split(',')}
+                short_code_info_dict = self.dbw.get_short_code_info_by_url(url)
                 return jsonify(short_code_info_dict), HTTPCodes.CODE_200.value
             else:
                 raise ShortCodeNotFoundError('Short code not found',

@@ -47,7 +47,7 @@ def get_short_code_stats():
     Returns:
         tuple: a message (short code stats) with an http response code
     """
-    return rh.get_short_code_stats()
+    return rh.get_short_code_stats(request)
 
 
 def main():
