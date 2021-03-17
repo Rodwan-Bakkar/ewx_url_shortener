@@ -7,7 +7,8 @@ from ewx_url_shortener.core.errors import (
     ResponseError,
     URLNotPresentError,
     InvalidShortCodeError,
-    ShortCodeAlreadyInUseError
+    ShortCodeAlreadyInUseError,
+    ShortCodeNotFoundError
 )
 
 
@@ -22,6 +23,7 @@ class RequestHandler:
         the url and its short code in the database,
         It will also do the necessary validations for the code if provided
         Args:
+            request(werkzeug.local.LocalProxy.Request): HTTP request
         Returns:
             tuple: a message with an http response code
         """
@@ -33,8 +35,7 @@ class RequestHandler:
                 raise URLNotPresentError('Url not present',
                                          HTTPCodes.CODE_400.value)
             elif self.dbw.url_already_exists(url):
-                # TODO: get the short code from databse
-                short_code = 'XXXXXX'
+                short_code = self.dbw.get_short_code_by_url(url)
                 res_msg = {
                     'msg': 'url is already shortened',
                     'shortcode': short_code
@@ -65,28 +66,48 @@ class RequestHandler:
         except ResponseError as re:
             return re.msg, re.code
 
-    def get_short_code(self):
+    def get_short_code(self, request):
         """
-        This function is to *****
+        This function is to check if short code exists in datastore and returns its info
         Args:
+            request(werkzeug.local.LocalProxy.Request): HTTP request
         Returns:
-            tuple: a message with an http response code
+            tuple: a message (short code info) with an http response code
         """
-        pass
+        short_code = request.args.get('short_code')
+        url = self.dbw.short_code_exists(short_code)
+        try:
+            if url:
+                short_code_info = self.dbw.get_short_code_info_by_url(url)
+                short_code_info_dict = {item.split(':')[0]: item.split(':')[1]
+                                        for item in short_code_info.split(',')}
+                return jsonify(short_code_info_dict), HTTPCodes.CODE_302.value
+            else:
+                raise ShortCodeNotFoundError('Short code not found',
+                                             HTTPCodes.CODE_404.value)
+        except ShortCodeNotFoundError as scnfe:
+            return scnfe.msg, scnfe.code
 
-    def get_short_code_stats(self):
+    def get_short_code_stats(self, request):
         """
-        This function is to *****
+        This function is to check if short code exists in datastore and returns its stats
         Args:
+            request(werkzeug.local.LocalProxy.Request): HTTP request
         Returns:
-            tuple: a message with an http response code
+            tuple: a message (short code stats) with an http response code
         """
 
-        res_msg = {
-            'created': '',
-            'lastRedirect': '',
-            'redirectCount': '',
-        }
-
-        return jsonify(res_msg), HTTPCodes.CODE_200.value
+        short_code = request.args.get('short_code')
+        url = self.dbw.short_code_exists(short_code)
+        try:
+            if url:
+                short_code_info = self.dbw.get_short_code_info_by_url(url)
+                short_code_info_dict = {item.split(':')[0]: item.split(':')[1]
+                                        for item in short_code_info.split(',')}
+                return jsonify(short_code_info_dict), HTTPCodes.CODE_200.value
+            else:
+                raise ShortCodeNotFoundError('Short code not found',
+                                             HTTPCodes.CODE_404.value)
+        except ShortCodeNotFoundError as scnfe:
+            return scnfe.msg, scnfe.code
 

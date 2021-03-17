@@ -16,3 +16,7 @@ class InvalidShortCodeError(ResponseError):
 
 class ShortCodeAlreadyInUseError(ResponseError):
     pass
+
+
+class ShortCodeNotFoundError(ResponseError):
+    pass

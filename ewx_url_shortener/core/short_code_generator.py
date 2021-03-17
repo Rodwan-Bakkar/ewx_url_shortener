@@ -1,13 +1,11 @@
 
 import random
 
-from ewx_url_shortener.model.database_wrapper import DatabaseWrapper
-
 
 class ShortCodeGenerator:
 
     NUMBERS = '0123456789'
-    ENGLISH_SMALL_LETTERS = 'abcdeifjklmnopqrstuvwxyz'
+    ENGLISH_SMALL_LETTERS = 'abcdefijklmnopqrstuvwxyz'
     ENGLISH_CAPITAL_LETTERS = 'ABCDEFIJKLMNOPQRSTUVWXYZZ'
     UNDERSCORE = '_'
     SHORT_CODE_CHARACTERS_RANGE = '{}{}{}{}'.format(
@@ -19,8 +17,8 @@ class ShortCodeGenerator:
 
     SHORT_CODE_LENGTH = 6
 
-    def __init__(self):
-        self.dbr = DatabaseWrapper()
+    def __init__(self, dbw):
+        self.dbw = dbw
 
     def generate_short_code(self):
         """
@@ -34,7 +32,7 @@ class ShortCodeGenerator:
             short_code_char_list = [random.choice(self.SHORT_CODE_CHARACTERS_RANGE)
                                     for _ in range(self.SHORT_CODE_LENGTH)]
             short_code = ''.join(short_code_char_list)
-            if not self.dbr.short_code_exists(short_code):
+            if not self.dbw.short_code_exists(short_code):
                 return short_code
 
     def validate_short_code(self, short_code):

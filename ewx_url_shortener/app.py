@@ -3,14 +3,14 @@ from flask import Flask, request
 
 from ewx_url_shortener.core.short_code_generator import ShortCodeGenerator
 from ewx_url_shortener.core.request_handler import RequestHandler
-from ewx_url_shortener.model.database_wrapper import DatabaseWrapper
+from ewx_url_shortener.model.redis_wrapper import RedisWrapper
 
 
 app = Flask(__name__)
 
-scg = ShortCodeGenerator()
-dbw = DatabaseWrapper()
-rh = RequestHandler(scg, dbw)
+redw = RedisWrapper()
+scg = ShortCodeGenerator(redw)
+rh = RequestHandler(scg, redw)
 
 
 @app.route('/shorten', methods=["POST"])
@@ -26,24 +26,26 @@ def shorten_url():
     return rh.shorten_url(request)
 
 
-@app.route('/<shortcode>', methods=["GET"])
+# TODO: write the route the correct way
+@app.route('/', methods=["GET"])
 def get_short_code():
     """
-    This function is to *****
+    This function is to check if short code exists in datastore and returns its info
     Args:
     Returns:
-        tuple: a message with an http response code
+        tuple: a message (short code info) with an http response code
     """
-    return rh.get_short_code()
+    return rh.get_short_code(request)
 
 
-@app.route('/<shortcode>/stats', methods=["GET"])
+# TODO: write the route the correct way
+@app.route('/stats', methods=["GET"])
 def get_short_code_stats():
     """
-    This function is to *****
+    This function is to check if short code exists in datastore and returns its stats
     Args:
     Returns:
-        tuple: a message with an http response code
+        tuple: a message (short code stats) with an http response code
     """
     return rh.get_short_code_stats()
 
