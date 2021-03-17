@@ -11,7 +11,7 @@ class RedisWrapper(StorageBase):
     REDIS_PORT = 6379
     # TODO: include milliseconds
     # TODO: should handle all redis exceptions
-    DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z'
+    DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self):
         self._redis = redis.Redis(
