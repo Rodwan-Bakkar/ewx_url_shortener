@@ -15,6 +15,9 @@ class StorageBase:
     def store_url(self, url, short_code):
         raise NotImplementedError
 
+    def update_url_stats(self, url):
+        raise NotImplementedError
+
     def short_code_exists(self, short_code):
         raise NotImplementedError
 

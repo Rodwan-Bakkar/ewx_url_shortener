@@ -10,6 +10,7 @@ class RedisWrapper(StorageBase):
     REDIS_HOST = "localhost"
     REDIS_PORT = 6379
     # TODO: include milliseconds
+    # TODO: should handle all redis exceptions
     DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z'
 
     def __init__(self):
@@ -25,18 +26,51 @@ class RedisWrapper(StorageBase):
         return False
 
     def store_url(self, url, short_code):
+        """
+        This function is to store a URL and it's short code if the is URL
+        is first time to be shortened
+
+        Args:
+            url(str): url
+            short_code(str): short code
+        Returns:
+            None:
+        """
         now_iso = datetime.datetime.now()
         now_iso_str = now_iso.strftime(self.DATE_FORMAT)
         created = now_iso_str
         last_redirect = now_iso_str
-        redirect_count = 0
-        value_to_store = 'shortcode:{},created:{},lastRedirect:{},redirectCount:{}'.format(
-            short_code,
-            created,
-            last_redirect,
-            redirect_count
-        )
+        redirect_count = 1
+        value_to_store_dict = {
+            'shortcode': short_code,
+            'created': created,
+            'lastRedirect': last_redirect,
+            'redirectCount': redirect_count,
+        }
+        value_to_store = self.convert_dict_to_redis_value(value_to_store_dict)
         self._redis.set(url, value_to_store)
+
+    def update_url_stats(self, url):
+        """
+        This function is to update the stats of URL if it already is shortened
+        Args:
+            url(str): url
+        Returns:
+            None:
+        """
+        redis_value = self._redis.get(url)
+        redis_value_dict = self.convert_redis_value_to_dict(redis_value)
+
+        now_iso = datetime.datetime.now()
+        now_iso_str = now_iso.strftime(self.DATE_FORMAT)
+        redis_value_dict['lastRedirect'] = now_iso_str
+
+        redirect_count = int(redis_value_dict['redirectCount'])
+        redis_value_dict['redirectCount'] = str(redirect_count+1)
+
+        redis_value_updated = self.convert_dict_to_redis_value(redis_value_dict)
+
+        self._redis.set(url, redis_value_updated)
 
     def short_code_exists(self, short_code):
         """
@@ -78,5 +112,41 @@ class RedisWrapper(StorageBase):
         Returns:
             str: the information of the URL
         """
-        return self._redis.get(url)
+        redis_value = self._redis.get(url)
+        redis_value_dict = self.convert_redis_value_to_dict(redis_value)
+        return redis_value_dict
+
+    @staticmethod
+    def convert_redis_value_to_dict(redis_value):
+        """
+        This function is to convert a string redis value to a python dictionary
+        Args:
+            redis_value(str): the redis value in string format
+        Returns:
+            dict: the redis value in dictionary format
+        """
+        redis_value_dict = {
+            item.split(':')[0]: item.split(':')[1]
+            for item in redis_value.split(',')
+        }
+        return redis_value_dict
+
+    @staticmethod
+    def convert_dict_to_redis_value(redis_value_dict):
+        """
+        This function is to convert a python dictionary to a string redis value
+        Args:
+            redis_value_dict(dict): the redis value in python dictionary format
+        Returns:
+            str: the redis value in string format
+        """
+        redis_value_str = 'shortcode:{},created:{},lastRedirect:{},redirectCount:{}'.format(
+            redis_value_dict['shortcode'],
+            redis_value_dict['created'],
+            redis_value_dict['lastRedirect'],
+            redis_value_dict['redirectCount'],
+        )
+        return redis_value_str
+
+
 
