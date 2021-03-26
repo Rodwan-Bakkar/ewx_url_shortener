@@ -14,7 +14,7 @@ abstract class, a redis implementations is provided. If you implement your own,
 plug it in by instantiating it in app.py and passing it as dependency to the necessary classes
 
 For testing:
-
+you can run all the tests by: python -m unittest discover tests
 
 
 
