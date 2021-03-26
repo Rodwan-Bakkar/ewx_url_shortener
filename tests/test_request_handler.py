@@ -172,48 +172,6 @@ class RequestHandlerTest(unittest.TestCase):
         self.assertEqual(1, result[0].json['redirectCount'])
         self.assertEqual(302, result[1])
 
-    # def test_get_short_code_stats_short_code_does_not_exit(self):
-    #     redis_wrapper_mocked = MagicMock(specset=RedisWrapper)
-    #     short_code_generator_mocked = MagicMock(specset=ShortCodeGenerator)
-    #     request_mocked = MagicMock(specset=LocalProxy)
-    #
-    #     redis_wrapper_mocked.short_code_exists.return_value = None
-    #
-    #     scg = RequestHandler(short_code_generator_mocked, redis_wrapper_mocked)
-    #
-    #     request_mocked.args = {
-    #         'short_code': 'qwe123'
-    #     }
-    #
-    #     result = scg.get_short_code(request_mocked)
-    #     self.assertEqual('Short code not found', result[0])
-    #     self.assertEqual(404, result[1])
-    #
-    # def test_get_short_code_stats_short_code_exists(self):
-    #     redis_wrapper_mocked = MagicMock(specset=RedisWrapper)
-    #     short_code_generator_mocked = MagicMock(specset=ShortCodeGenerator)
-    #     request_mocked = MagicMock(specset=LocalProxy)
-    #
-    #     redis_wrapper_mocked.short_code_exists.return_value = 'test_url'
-    #     redis_wrapper_mocked.get_short_code_info_by_url.return_value = {
-    #         'shortcode': 'qwe123',
-    #         'created': '2021-01-10T20:45:00.000Z',
-    #         'lastRedirect': '2021-01-11T20:45:00.000Z',
-    #         'redirectCount': 1
-    #     }
-    #
-    #     scg = RequestHandler(short_code_generator_mocked, redis_wrapper_mocked)
-    #
-    #     request_mocked.args = {
-    #         'short_code': 'qwe123'
-    #     }
-    #
-    #     result = scg.get_short_code(request_mocked)
-    #     self.assertEqual('qwe123', result[0].json['shortcode'])
-    #     self.assertEqual('2021-01-10T20:45:00.000Z', result[0].json['created'])
-    #     self.assertEqual('2021-01-11T20:45:00.000Z', result[0].json['lastRedirect'])
-    #     self.assertEqual(1, result[0].json['redirectCount'])
-    #     self.assertEqual(302, result[1])
 
 
 

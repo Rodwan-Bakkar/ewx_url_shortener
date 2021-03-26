@@ -126,7 +126,7 @@ class RedisWrapper(StorageBase):
             dict: the redis value in dictionary format
         """
         redis_value_dict = {
-            item.split(':')[0]: item.split(':')[1]
+            item.split(':', 1)[0]: item.split(':', 1)[1]
             for item in redis_value.split(',')
         }
         return redis_value_dict
