@@ -26,7 +26,6 @@ def shorten_url():
     return rh.shorten_url(request)
 
 
-# TODO: write the route the correct way
 @app.route('/', methods=["GET"])
 def get_short_code():
     """
@@ -38,7 +37,6 @@ def get_short_code():
     return rh.get_short_code(request)
 
 
-# TODO: write the route the correct way
 @app.route('/stats', methods=["GET"])
 def get_short_code_stats():
     """
